@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buyer Details - Book Bridge</title>
+  <style>
+    body {font-family: 'Segoe UI', sans-serif;background-color: #f3f4f6;margin: 0;padding: 0;}
+    header {background-color: #4a4c52;color: white;text-align: center;padding: 25px 0;font-size: 28px;font-weight: bold;}
+    .container {max-width: 600px;margin: 40px auto;background: #fff;padding: 30px;border-radius: 12px;box-shadow: 0 6px 15px rgba(0,0,0,0.1);}
+    h2 {text-align: center;color: #333;margin-bottom: 20px;}
+    label {font-weight: bold;margin-bottom: 6px;display: block;color: #444;}
+    input, textarea {width: 100%;padding: 10px;margin-bottom: 15px;border: 1px solid #ccc;border-radius: 6px;font-size: 15px;}
+    textarea {resize: none;height: 100px;}
+    .submit-btn {background: #4a4c52;color: white;padding: 12px 20px;border: none;border-radius: 6px;font-size: 16px;cursor: pointer;width: 100%;transition: background 0.3s ease;margin-bottom: 15px;}
+    .submit-btn:hover {background: #333;}
+    .back-btn {background: #333;color: white;padding: 10px 15px;border: none;border-radius: 6px;font-size: 15px;cursor: pointer;width: 100%;transition: background 0.3s ease;}
+    .back-btn:hover {background: #555;}
+    .payment-btn {background: #10B981;color: white;border: none;padding: 8px 14px;border-radius: 6px;cursor: pointer;font-size: 14px;font-weight: bold;transition: background 0.3s ease, transform 0.2s ease;margin-top: 10px;}
+    .payment-btn:hover {background-color: #0c9467;transform: scale(1.05);}
+    .qr-modal {display: none;position: fixed;z-index: 1000;left: 0;top: 0;width: 100%;height: 100%;overflow: auto;background-color: rgba(0,0,0,0.7);}
+    .qr-content {background-color: #fff;margin: 10% auto;padding: 20px;border-radius: 10px;max-width: 350px;text-align: center;position: relative;}
+    .close-btn {position: absolute;top: 10px;right: 15px;font-size: 18px;font-weight: bold;cursor: pointer;color: #333;}
+    .qr-content img {max-width: 100%;margin: 15px 0;}
+  </style>
+</head>
+<body>
+
+  <header>📝 Buyer Details</header>
+
+  <div class="container">
+    <h2>Enter Your Information</h2>
+    <form id="buyerForm">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="phone">Phone Number</label>
+      <input type="tel" id="phone" name="phone" required>
+
+      <label for="payment">Payment (Optional, default: Cash on Delivery)</label>
+      <br>
+      <button type="button" class="payment-btn" id="gpayBtn">Pay via Google Pay</button>
+      <br><br>
+
+      <label for="address">Delivery Address</label>
+      <textarea id="address" name="address" required></textarea>
+
+      <button type="submit" class="submit-btn">Submit Details</button>
+    </form>
+
+    <button class="back-btn" onclick="window.location.href='checkout.html'">⬅ Back to Checkout</button>
+  </div>
+
+  <!-- QR Modal -->
+  <div id="qrModal" class="qr-modal">
+    <div class="qr-content">
+      <span class="close-btn" id="closeQr">&times;</span>
+      <p>Scan this to make your payment</p>
+      <img id="qrImage" src="" alt="Google Pay QR Code">
+    </div>
+  </div>
+
+  <footer>© 2025 Book Bridge</footer>
+
+  <!-- ✅ Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // 🔹 Replace with your Firebase Config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "SENDER_ID",
+      appId: "APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const gpayBtn = document.getElementById('gpayBtn');
+    const qrModal = document.getElementById('qrModal');
+    const closeQr = document.getElementById('closeQr');
+    const qrImage = document.getElementById('qrImage');
+
+    // 🔹 Fetch GPay QR from Firestore
+    gpayBtn.addEventListener('click', async function() {
+      const querySnapshot = await getDocs(collection(db, "books"));
+      if (querySnapshot.empty) {
+        alert("Donor has not uploaded a Google Pay QR Code.");
+        return;
+      }
+      let lastBook = null;
+      querySnapshot.forEach((doc) => { lastBook = doc.data(); });
+      if (!lastBook || !lastBook.gpayQR) {
+        alert("No QR Code available.");
+        return;
+      }
+      qrImage.src = lastBook.gpayQR;
+      qrModal.style.display = 'block';
+    });
+
+    closeQr.addEventListener('click', function() {
+      qrModal.style.display = 'none';
+    });
+    window.addEventListener('click', function(e) {
+      if (e.target === qrModal) qrModal.style.display = 'none';
+    });
+
+    // 🔹 Buyer Form Submit → Firestore
+    document.getElementById("buyerForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const phone = document.getElementById("phone").value;
+      const address = document.getElementById("address").value;
+
+      try {
+        await addDoc(collection(db, "buyers"), {
+          name, email, phone, address,
+          paymentMethod: "Cash on Delivery",
+          timestamp: new Date()
+        });
+        alert("✅ Details submitted successfully! Seller will contact you soon.");
+        window.location.href = "home.html";
+      } catch (error) {
+        console.error("Error saving buyer details:", error);
+        alert("❌ Failed to save details. Try again.");
+      }
+    });
+  </script>
+     <script type="module" src="firebase.js"></script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Checkout - Book Bridge</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #F9F9F9;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #4a4c52;
+      color: white;
+      text-align: center;
+      padding: 25px 0;
+      font-size: 30px;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    img {
+      max-width: 200px;
+      display: block;
+      margin-bottom: 15px;
+      border-radius: 8px;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .confirm-btn {
+      background: #4a4c52;
+      color: white;
+    }
+
+    .back-btn {
+      background: #333;
+      color: white;
+      margin-top: 15px;
+    }
+
+    footer {
+      background-color: #41424f;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      font-size: 14px;
+    }
+  </style> 
+</head>
+<body>
+
+  <header>📦 Checkout - Book Bridge</header>
+
+  <div class="container">
+    <h2>Book Purchase Details</h2>
+    <div id="bookDetails"></div>
+
+    <button class="confirm-btn" onclick="confirmPurchase()">Confirm Purchase</button>
+    <br>
+    <button class="back-btn" onclick="window.location.href='search.html'">Back</button>
+  </div>
+
+  <footer>© 2025 Book Bridge</footer>
+
+  <!-- ✅ Firestore integration -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // 🔹 Use your actual Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBpi4Q2ZZRvtMp3uI3lU2oIVAdkEJ9zMP4",
+      authDomain: "book-bridge-c8b78.firebaseapp.com",
+      projectId: "book-bridge-c8b78",
+      storageBucket: "book-bridge-c8b78.firebasestorage.app",
+      messagingSenderId: "324079578526",
+      appId: "1:324079578526:web:597bc3930633306f6d7a8f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const bookDetails = document.getElementById('bookDetails');
+    const bookId = localStorage.getItem("selectedBookId");
+
+    async function loadBook() {
+      if (!bookId) {
+        bookDetails.innerHTML = `<p>No book selected.</p>`;
+        return;
+      }
+
+      try {
+        const docRef = doc(db, "books", bookId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const book = docSnap.data();
+          bookDetails.innerHTML = `
+            ${book.frontImage ? `<img src="${book.frontImage}" alt="Front Image">` : ``}
+            ${book.realImages && book.realImages.length > 0 ? `<img src="${book.realImages[0]}" alt="Book Image">` : ``}
+            <p><strong>Book Title:</strong> ${book.title}</p>
+            <p><strong>Author:</strong> ${book.author}</p>
+            <p><strong>Price:</strong> ${book.price}</p>
+            <p><strong>Contact:</strong> ${book.contact}</p>
+          `;
+        } else {
+          bookDetails.innerHTML = `<p>Book not found.</p>`;
+        }
+      } catch (error) {
+        console.error("Error fetching book:", error);
+        bookDetails.innerHTML = `<p>Error loading book details.</p>`;
+      }
+    }
+
+    loadBook();
+
+    // ✅ Confirm Purchase function
+    window.confirmPurchase = function () {
+      let warning = confirm("⚠ Are you sure you want to confirm this purchase?\n\nOnce confirmed, you will need to provide your details.");
+      if (warning) {
+        window.location.href = 'buyer-details.html'; 
+      } else {
+        alert("❌ Purchase canceled.");
+      }
+    };
+  </script>
+    <script type="module" src="firebase.js"></script>
+</body>
+</html>

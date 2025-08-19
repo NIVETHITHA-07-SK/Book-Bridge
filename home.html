@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">  
+    <title>Book Bridge - Donate or Sell Books</title> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      /* --- Unga existing CSS --- */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #F4F4F4;
+        color: #333333;
+      }
+      header {
+        background-color: #4a4c52;
+        color: white;
+        padding: 25px 0;
+        text-align: center;
+        font-size: 34px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        box-shadow: 0 2px 6px #4a4c52;
+      }
+      nav {
+        background-color: #2D2D2D;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        box-shadow: 0 2px 4px rgba(73, 71, 71, 0.1);
+      }
+      nav a {
+        color: white;
+        padding: 15px 25px;
+        text-decoration: none;
+        text-transform: uppercase;
+        font-weight: 500;
+        transition: background 0.3s ease;
+      }
+      nav a:hover {
+        background-color: #585b5a;
+        color: white;
+        border-radius: 5px;
+      }
+      .container {
+        padding: 40px 5%;
+      }
+      .section {
+        background: white;
+        padding: 30px;
+        margin-bottom: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease;
+      }
+      .section:hover {
+        transform: translateY(-3px);
+      }
+      .section h2 {
+        color: #585d68;
+        margin-bottom: 15px;
+        font-size: 26px;
+      }
+      .section p {
+        font-size: 18px;
+        line-height: 1.6;
+        color: #444;
+      }
+      .btn {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 12px 25px;
+        background-color: #10B981;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: background 0.3s ease;
+      }
+      .btn:hover {
+        background-color: #199169;
+      }
+      footer {
+        background-color: #41424f;
+        color: rgb(255, 255, 255);
+        text-align: center;
+        padding: 18px 0;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        font-size: 14px;
+      }
+      @media (max-width: 768px) {
+        nav {
+          flex-direction: column;
+          align-items: center;
+        }
+        nav a {
+          width: 100%;
+          text-align: center;
+          padding: 10px;
+        }
+        .section h2 {
+          font-size: 22px;
+        }
+        .section p {
+          font-size: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body> 
+    <header>📚 Book Bridge</header>  
+    <nav>
+      <a href="#">Home</a>
+      <a href="upload.html">Donate/Sell</a>
+      <a href="search.html">Search</a>
+      <a href="about.html">About</a>
+    </nav>  
+    <div class="container">
+      <div class="section">
+        <h2>📖 Welcome to Book Bridge</h2>
+        <p>
+          Have unused but good quality books? Don’t throw them away! With Book Bridge, you can donate or sell your books at half price and help others in need. Every book shared builds a bridge to knowledge.
+        </p>
+      </div>
+      <div class="section">
+        <h2>📦 Donate or Sell Books</h2>
+        <p>
+          Want to donate or sell your books? Click below and list your books with details like title, condition, and price (or mark as FREE).
+        </p>
+        <a href="upload.html" class="btn">Donate / Sell Now</a>
+      </div>
+      <div class="section">
+        <h2>🔍 Find the Book You Need</h2>
+        <p>
+          Looking for a book? Search by title or subject and check if someone has donated or listed it at half price. Connect, order, and receive!
+        </p>
+        <a href="search.html" class="btn">Search Books</a>
+      </div>
+    </div>  
+    <footer>© 2025 Book Bridge | Created with ❤️ to spread knowledge</footer>
+
+    <!-- ✅ Firebase Setup -->
+    <script type="module">
+      // Import Firebase SDK
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+      import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+      // 🔥 Replace with your Firebase config (Project Settings → SDK setup)
+      const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      console.log("✅ Firebase Connected!");
+    </script>
+  </body>
+</html>

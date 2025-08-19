@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Search Books - Book Bridge</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #F9F9F9;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #434644;
+      color: white;
+      text-align: center;
+      padding: 25px 0;
+      font-size: 30px;
+      font-weight: bold;
+    }
+
+    .back-btn {
+      background: #10B981;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s ease;
+      display: block;
+      margin: 15px 0 40px 0;
+      width: 100px;
+    }
+    .back-btn:hover {
+      background: #7f8784;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .results {
+      margin-top: 30px;
+    }
+
+    .book {
+      padding: 15px;
+      background: #f1f1f1;
+      margin-bottom: 15px;
+      border-radius: 8px;
+    }
+
+    .book img {
+      max-width: 100px;
+      display: block;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+    .buy-btn {
+      background:#47484a;
+      color:white;
+    }
+    .view-btn {
+      background:#4d514f;
+      color:white;
+    }
+
+    footer {
+      background-color: #3d3e40;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      font-size: 14px;
+    }
+
+    /* Modal (popup) styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      text-align: center;
+    }
+    .modal-content img {
+      max-width: 100%;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+    .close {
+      float: right;
+      font-size: 20px;
+      cursor: pointer;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    🔍 Search Books - Book Bridge
+  </header>
+
+  <div class="container">
+    <h2>Find Your Book</h2>
+    <input type="text" id="searchInput" placeholder="Enter book title, subject, or author...">
+    <div class="results" id="results"></div>
+    
+    <!-- Back Button moved here -->
+    <button class="back-btn" onclick="goBack()">Back</button>
+  </div>
+  
+  <footer>© 2025 Book Bridge</footer>
+
+  <!-- Modal -->
+  <div class="modal" id="imageModal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h3>📷 Real Book Images</h3>
+      <div id="realImagesContainer"></div>
+    </div>
+  </div>
+
+<!-- ✅ Firebase SDK + Config (Module Syntax) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // 🔥 Replace with your Firebase Config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const resultsContainer = document.getElementById('results');
+  const searchInput = document.getElementById('searchInput');
+  let books = []; // Firestore la store panna data
+
+  // ✅ Firestore la Books fetch pannum function
+  async function fetchBooks() {
+    const snapshot = await getDocs(collection(db, "books"));
+    books = snapshot.docs.map(doc => doc.data());
+    displayBooks(books);  // <-- 🚀 call panniten
+  }
+
+  function displayBooks(bookList) {
+    resultsContainer.innerHTML = '';
+    if (bookList.length === 0) {
+      resultsContainer.innerHTML = "<p>No books found.</p>";
+      return;
+    }
+    bookList.forEach((book, index) => {
+      const div = document.createElement('div');
+      div.classList.add('book');
+      div.innerHTML = `
+        <img src="${book.frontImage || (book.realImages && book.realImages[0])}" alt="Book Image">
+        <strong>Book Title:</strong> ${book.title}<br/>
+        <strong>Author:</strong> ${book.author}<br/>
+        <strong>Condition:</strong> ${book.condition}<br/>
+        <strong>Price:</strong> ${book.price}<br/>
+        <strong>Contact:</strong> ${book.contact}<br/><br/>
+        <button class="buy-btn" onclick="buyBook(${index})">Get Book</button>
+        <button class="view-btn" onclick="viewImages(${index})">View Real Images</button>
+      `;
+      resultsContainer.appendChild(div);
+    });
+  }
+
+  window.buyBook = function(index) {
+    const selectedBook = books[index];
+    localStorage.setItem('selectedBook', JSON.stringify(selectedBook));
+    window.location.href = 'checkout.html';
+  }
+
+  window.viewImages = function(index) {
+    const book = books[index];
+    const modal = document.getElementById('imageModal');
+    const container = document.getElementById('realImagesContainer');
+    container.innerHTML = '';
+
+    if (book.realImages && book.realImages.length > 0) {
+      book.realImages.forEach(img => {
+        const imageElem = document.createElement('img');
+        imageElem.src = img;
+        container.appendChild(imageElem);
+      });
+    } else {
+      container.innerHTML = "<p>No real images uploaded for this book.</p>";
+    }
+
+    modal.style.display = 'flex';
+  }
+
+  window.closeModal = function() {
+    document.getElementById('imageModal').style.display = 'none';
+  }
+
+  window.goBack = function() {
+    window.history.back();
+  }
+
+  // 🔍 Search filter
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase();
+    const filteredBooks = books.filter(book =>
+      book.title.toLowerCase().includes(query) ||
+      book.author.toLowerCase().includes(query) ||
+      book.condition.toLowerCase().includes(query) ||
+      book.price.toLowerCase().includes(query)
+    );
+    displayBooks(filteredBooks);
+  });
+
+  // 🚀 Firestore la irundhu books load pannum
+  fetchBooks();
+</script>
+   <script type="module" src="firebase.js"></script>
+</body>
+</html>

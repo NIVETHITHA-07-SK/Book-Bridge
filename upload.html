@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Donate or Sell Books - Book Bridge</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #F9F9F9;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #4a4c52;
+      color: white;
+      text-align: center;
+      padding: 25px 0;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .back-btn, .submit-btn {
+      background: #10B981;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background 0.3s ease, transform 0.2s ease;
+      margin-top: 20px;
+    }
+    .back-btn:hover, .submit-btn:hover {
+      background-color: #0c9467;
+      transform: scale(1.05);
+    }
+    .container {
+      max-width: 700px;
+      margin: 50px auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #333;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+    .info, .exfo {
+      color: #777;
+      font-size: 13px;
+      font-weight: normal;
+      margin-left: 8px;
+    }
+    footer {
+      background-color: #41424f;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<header>📚 Donate or Sell Your Book</header>
+
+<div class="container">
+  <h2>Fill the Details</h2>
+  <form id="donateForm">
+    <label>Book Title:</label>
+    <input type="text" name="title" placeholder="Eg: Atomic Habits" required>
+
+    <label>Author:</label>
+    <input type="text" name="author" placeholder="Eg: James Clear" required>
+
+    <label>Condition:</label>
+    <select name="condition">
+      <option>New</option>
+      <option>Used</option>
+    </select>
+
+    <label>Price (₹ or FREE):
+      <span class="exfo">(if selling, keep 50% of original price)</span>
+    </label>
+    <input type="text" name="price" placeholder="Eg: 150 or FREE" required>
+
+    <label>Your Email:</label>
+    <textarea name="Email" rows="3" placeholder="Email" required></textarea>
+
+    <label>
+      Front Cardboard Image (Mandatory):
+      <span class="info">(max 500KB)</span>
+    </label>
+    <input type="file" name="frontImage" accept="image/*" required>
+
+    <label>
+      Upload 5 Real Book Images (Mandatory):
+      <span class="info">(total max 1.5MB)</span>
+    </label>
+    <input type="file" name="realImages" accept="image/*" multiple required>
+
+    <label>
+      Upload Your Google Pay QR Code (Mandatory):
+      <span class="info">(max 500KB)</span>
+    </label>
+    <input type="file" name="gpayQR" accept="image/*" required>
+
+    <button type="submit" class="submit-btn">Submit</button>
+  </form>
+
+  <!-- Back Button -->
+  <button class="back-btn" onclick="history.back()">⬅ Back</button>
+</div>
+
+<footer>© 2025 Book Bridge</footer>
+
+<!-- ✅ Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+  // 🔹 Replace with your Firebase config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  document.getElementById('donateForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const form = e.target;
+
+    const frontFile = form.frontImage.files[0];
+    const realFiles = form.realImages.files;
+    const qrFile = form.gpayQR.files[0];
+
+    if (!frontFile || realFiles.length < 5 || !qrFile) {
+      alert("All images and QR are mandatory!");
+      return;
+    }
+
+    try {
+      // 🔹 Upload Front Image
+      const frontRef = ref(storage, 'books/front_' + Date.now());
+      await uploadBytes(frontRef, frontFile);
+      const frontURL = await getDownloadURL(frontRef);
+
+      // 🔹 Upload Real Images
+      const realImageUrls = [];
+      for (let i = 0; i < realFiles.length; i++) {
+        const imgRef = ref(storage, `books/real_${Date.now()}_${i}`);
+        await uploadBytes(imgRef, realFiles[i]);
+        const url = await getDownloadURL(imgRef);
+        realImageUrls.push(url);
+      }
+
+      // 🔹 Upload QR Code
+      const qrRef = ref(storage, 'books/qr_' + Date.now());
+      await uploadBytes(qrRef, qrFile);
+      const qrURL = await getDownloadURL(qrRef);
+
+      // 🔹 Save Book Details in Firestore
+      await addDoc(collection(db, "books"), {
+        title: form.title.value.trim(),
+        author: form.author.value.trim(),
+        condition: form.condition.value,
+        price: form.price.value.trim(),
+        contact: form.Email.value.trim(),
+        frontImage: frontURL,
+        realImages: realImageUrls,
+        qrCodeUrl: qrURL,
+        createdAt: new Date()
+      });
+
+      alert("✅ Book submitted successfully!");
+      form.reset();
+
+      // 🔹 Mark refresh flag for search page
+      localStorage.setItem("refreshBooks", "true");
+
+    } catch (err) {
+      console.error("❌ Error:", err);
+      alert("Upload failed. Please try again.");
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>About Us - Book Bridge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Book Bridge connects readers and donors by sharing books to spread knowledge and sustainability.">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #F4F4F4;
+      color: #333333;
+    }
+
+    header {
+      background-color: #4a4c52;
+      color: white;
+      padding: 25px 0;
+      text-align: center;
+      font-size: 34px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 6px #4a4c52;
+    }
+
+    nav {
+      background-color: #2D2D2D;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      box-shadow: 0 2px 4px rgba(73, 71, 71, 0.1);
+    }
+
+    nav a {
+      color: white;
+      padding: 15px 25px;
+      text-decoration: none;
+      text-transform: uppercase;
+      font-weight: 500;
+      transition: background 0.3s ease;
+    }
+
+    nav a:hover {
+      background-color: #585b5a;
+      color: white;
+      border-radius: 5px;
+    }
+
+    .container {
+      padding: 40px 5%;
+    }
+
+    .section {
+      background: white;
+      padding: 30px;
+      margin-bottom: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease;
+    }
+
+    .section:hover {
+      transform: translateY(-3px);
+    }
+
+    .section h2 {
+      color: #585d68;
+      margin-bottom: 15px;
+      font-size: 26px;
+    }
+
+    .section p {
+      font-size: 18px;
+      line-height: 1.6;
+      color: #444;
+      margin-bottom: 15px;
+    }
+
+    .back-btn {
+      display: block;
+      width: 200px;
+      margin: 20px auto;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background-color: #4a4c52;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      text-align: center;
+    }
+
+    .back-btn:hover {
+      background-color: #333;
+    }
+
+    footer {
+      background-color: #41424f;
+      color: white;
+      text-align: center;
+      padding: 18px 0;
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      nav a {
+        width: 100%;
+        text-align: center;
+        padding: 10px;
+      }
+
+      .section h2 {
+        font-size: 22px;
+      }
+
+      .section p {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>📚 Book Bridge</header>
+
+  <nav>
+    <a href="home.html">Home</a>
+    <a href="about.html">About Us</a>
+    <a href="reviews.html">Reviews</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+
+  <div class="container">
+    <div class="section">
+      <h2>📖 About Book Bridge</h2>
+      <p>
+        Book Bridge isn’t just a website — it’s a movement to connect readers, learners, and dreamers.  
+        Our vision is simple: <strong>no book should gather dust when it can inspire someone else.</strong>
+      </p>
+      <p>
+         At this, we also hold a clear vision to create a world where every book finds its reader and no learner is left behind. We strongly value sustainability, ensuring that unsued books get a second life while reducing waste and protecting our planet.
+      </p>
+      <p>
+        We provide a space where people can <em>donate</em> or <em>sell</em> their gently used books at affordable prices, 
+        ensuring knowledge reaches every hand that seeks it. From school textbooks to novels, 
+        Book Bridge gives every book a second chance to create an impact.
+      </p>
+      <p>
+        By joining our community, you’re not only saving money but also saving stories, 
+        ideas, and knowledge from being forgotten.  
+        Together, we’re building a bridge — <strong>a bridge of knowledge, generosity, and shared passion for reading.</strong>
+      </p>
+      <p>
+        🌍 <strong>Our Mission:</strong> To make education and reading accessible to everyone, regardless of financial background.<br> 
+        💡 <strong>Our Belief:</strong> Books have the power to change lives, and sharing them multiplies that power. <br> 
+        ❤️ <strong>Our Promise:</strong> A sustainable, supportive, and inspiring book-sharing community.  
+      </p>
+    </div>
+  </div>
+
+  <!-- Back Button before footer -->
+  <button class="back-btn" onclick="window.history.back()">⬅ Back</button>
+
+  <footer>
+    <p>© 2025 Book Bridge | Created with ❤️ to spread knowledge</p>
+  </footer>
+
+</body>
+</html>
