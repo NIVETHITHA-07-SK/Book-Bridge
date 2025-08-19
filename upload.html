@@ -192,7 +192,7 @@
         author: form.author.value.trim(),
         condition: form.condition.value,
         price: form.price.value.trim(),
-        contact: form.Email.value.trim(),
+        contact: form.elements["Email"].value.trim(),   // ✅ FIXED HERE
         frontImage: frontURL,
         realImages: realImageUrls,
         qrCodeUrl: qrURL,
